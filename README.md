@@ -25,9 +25,11 @@ Every Monday, a search on [OpenAlex](https://openalex.org) (plus Semantic Schola
 
 **How to screen them.**
 
-1. On the candidates page, click **Open the screening sheet** (this opens `data/candidates/to_screen.csv` on GitHub).
-2. Write `keep` or `reject` in the `decision` column. Optionally fill in `main_theme` and `region`.
-3. Click **Commit changes**. Kept papers are added to the map within a few minutes; rejected papers never come back.
+1. On the candidates page, click **Keep** or **Reject** under each paper. For kept papers you can pick a theme and a region.
+2. Click **Send decisions to GitHub** at the bottom of the screen. GitHub opens a pre-filled issue: click **Create**.
+3. A few minutes later the issue is closed with a short report, kept papers are on the map, and rejected papers never come back.
+
+Your choices are remembered in your browser until you send them. You need to be signed in to GitHub as the owner (or a collaborator) of the repository.
 
 **Search now or change the search.** Run it any time from **Actions → Literature watch → Run workflow**. Queries and the papers whose citations are followed are listed in [`config/search.yaml`](config/search.yaml) (titles and abstracts only; `"exact phrase"`, `AND`, `OR`, `NOT` allowed).
 

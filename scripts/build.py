@@ -353,7 +353,8 @@ for c in run.get('candidates', []):
                   'cites': [k for k in (c.get('cites_in_corpus') or '').split('; ') if k], 'st': st})
 cmeta = {'date': run.get('date', ''), 'since': run.get('since', ''), 'errors': run.get('errors', []),
          'repo': os.environ.get('GITHUB_REPOSITORY', ''),
-         'labels': {x['key']: x['label'] for x in REFS}}
+         'labels': {x['key']: x['label'] for x in REFS},
+         'themes': MAIN_THEMES + ['Other – to be classified'], 'regions': REGIONS[1:]}
 ctpl = (ROOT / 'templates' / 'candidates_template.html').read_text(encoding='utf-8')
 cpage = (ctpl.replace('/*__CANDS__*/null', json.dumps(cands, ensure_ascii=False).replace('</', '<\\/'))
              .replace('/*__META__*/null', json.dumps(cmeta, ensure_ascii=False).replace('</', '<\\/')))

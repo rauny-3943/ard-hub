@@ -13,4 +13,4 @@ Everything is in English; article titles stay in their original language.
 - The synthesis is in `data/synthesis.html`; references are written `[[Key]]`.
 - Before proposing a change: `python scripts/build.py && python -m pytest -q tests` must pass.
 - Never add paper PDFs or full abstracts to the repository, and never use unauthorised access sources (Sci-Hub, etc.).
-- New candidates come from `.github/workflows/watch.yml`; screening happens in `data/candidates/to_screen.csv` (see docs/SETUP.md).
+- New candidates come from `.github/workflows/watch.yml`; screening happens through “Screening decisions” issues sent from the candidates page, or directly in `data/candidates/to_screen.csv` (see docs/SETUP.md).

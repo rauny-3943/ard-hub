@@ -1,0 +1,71 @@
+# Applies the decisions sent from the "New candidates" page. The page opens a GitHub issue titled
+# "Screening decisions …"; when you create it, this workflow records the decisions, adds the kept papers
+# to the corpus, refreshes the website, then comments on the issue and closes it.
+# Only you (OWNER), members and collaborators can trigger it.
+name: Apply screening decisions
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+concurrency:
+  group: corpus-data
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: >-
+      startsWith(github.event.issue.title, 'Screening decisions') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Record the decisions
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python scripts/apply_screening.py --summary "$RUNNER_TEMP/summary.md"
+      - name: Add the kept papers to the corpus
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+        run: python scripts/integrate.py | tee -a "$RUNNER_TEMP/summary.md"
+      - name: Check the corpus
+        run: |
+          python scripts/build.py
+          python -m pytest -q tests
+      - name: Save the corpus
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "Screening decisions from issue #${{ github.event.issue.number }}" || echo "Nothing to save"
+          git pull --rebase
+          git push
+      - name: Refresh the website
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run publish.yml --ref main
+      - name: Report and close the issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+          STATUS: ${{ job.status }}
+        run: |
+          {
+            if [ "$STATUS" = "success" ]; then echo "Done. The map will be updated in a few minutes."; else echo "Something went wrong: see the run log in the Actions tab."; fi
+            echo
+            cat "$RUNNER_TEMP/summary.md" 2>/dev/null || true
+          } > "$RUNNER_TEMP/comment.md"
+          gh issue comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md"
+          if [ "$STATUS" = "success" ]; then gh issue close "$NUMBER" --repo "$GITHUB_REPOSITORY"; fi

@@ -22,7 +22,8 @@ Technical notes for whoever maintains the repository. Users only need the [READM
 |---|---|---|
 | `publish.yml` | push to `main` (data, templates, scripts), or called by the others | builds `site/` (map, candidates page, .bib, .xlsx, .csv), runs the tests, deploys to Pages |
 | `watch.yml` | Monday 06:17 UTC, or by hand | `scripts/search.py` → commits `data/candidates/` → calls `publish.yml` |
-| `integrate.yml` | push that changes `data/candidates/to_screen.csv` | `scripts/integrate.py` (keep → corpus, reject → `rejected.txt`) → commits → calls `publish.yml` |
+| `screening.yml` | issue titled “Screening decisions …” opened by the owner/collaborators (sent from the candidates page) | `scripts/apply_screening.py` writes the decisions into `to_screen.csv`, then `integrate.py` → commits → calls `publish.yml` → comments and closes the issue |
+| `integrate.yml` | push that changes `data/candidates/to_screen.csv` (manual editing of the sheet) | `scripts/integrate.py` (keep → corpus, reject → `rejected.txt`) → commits → calls `publish.yml` |
 | `check.yml` | pull requests | build + tests |
 | `synthesis.yml` | by hand | drafts synthesis text with GitHub Models, opens a pull request for review |
 | `claude.yml` | `@claude` in an issue (owner/collaborators only) | Claude edits the corpus following `CLAUDE.md`, opens a pull request |
@@ -48,6 +49,7 @@ pip install -r requirements.txt
 python scripts/build.py && python -m pytest -q tests  # then open site/index.html
 ```
 
+- Edit the screening sheet by hand: in `to_screen.csv` the first column is `decision`, so each pending line starts with a comma; type `keep` or `reject` before that first comma.
 - Add DOIs by hand: `python scripts/integrate.py --doi 10.xxxx/yyyy --theme "Soil & ARD" --region Pyrenees`
 - Compare PDFs and Zotero: `python scripts/compare_local.py [--folder ~/Zotero/storage] [--zotero data/zotero.bib]`
   (keep a Zotero export up to date with Better BibTeX → *Export Collection* → *Better BibLaTeX* → *Keep updated*)

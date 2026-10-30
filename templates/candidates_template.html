@@ -75,6 +75,20 @@ ol.list > li{border-bottom:1px solid var(--line);padding:12px 4px;display:grid;g
 .tag.rej{text-decoration:line-through}
 .tag.cite{border-color:var(--accent);color:var(--accent)}
 .empty{padding:18px 4px;color:var(--muted)}
+.decide{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.decide button{font:500 12.5px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:4px 10px;cursor:pointer}
+.decide button:hover{border-color:var(--accent)}
+.decide button[aria-pressed="true"].k{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.decide button[aria-pressed="true"].r{background:var(--muted);border-color:var(--muted);color:var(--surface)}
+.decide select{font:12.5px var(--f-body);padding:3px 6px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);max-width:100%}
+.sendbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--ink);color:var(--bg);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sendbar .in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px}
+.sendbar a,.sendbar button{font:600 13.5px var(--f-body);border-radius:var(--r);padding:7px 12px;cursor:pointer;text-decoration:none;border:1px solid var(--bg)}
+.sendbar a{background:var(--bg);color:var(--ink)}
+.sendbar button{background:transparent;color:var(--bg)}
+.sendbar .msg{flex:1 1 220px;min-width:0;opacity:.85;font-size:13px}
+main.wrap{padding-bottom:90px}
 footer{padding-block:36px;color:var(--muted);font-size:13px}
 @media (max-width:700px){ .filters{position:static} ol.list > li{grid-template-columns:40px minmax(0,1fr)} }
 </style>
@@ -90,7 +104,7 @@ footer{padding-block:36px;color:var(--muted);font-size:13px}
 
 <section class="howto" aria-label="How to screen the candidates">
   <div><h2>Read the score</h2><p>Score = number of searches that found the paper + 2 for each corpus paper it cites. Papers that cite the corpus are usually the most relevant; a score of 1 is often noise.</p></div>
-  <div><h2>Keep or reject</h2><p>Open the screening sheet on GitHub, write <span class="mono">keep</span> or <span class="mono">reject</span> in the <span class="mono">decision</span> column, then commit. Kept papers join the map within a few minutes; rejected ones never come back.</p><a class="btn" id="lnkEdit" target="_blank" rel="noopener">Open the screening sheet</a></div>
+  <div><h2>Keep or reject</h2><p>Click <b>Keep</b> or <b>Reject</b> under each paper (you can set its theme and region), then <b>Send decisions</b> at the bottom of the screen. GitHub opens a pre-filled issue: click <b>Create</b>. Kept papers join the map within a few minutes; rejected ones never come back.</p><a class="muted" id="lnkEdit" target="_blank" rel="noopener" style="font-size:13px">Or edit the screening sheet by hand</a></div>
   <div><h2>Search again</h2><p>The watch runs every Monday. You can also run it now, or change the queries and followed papers in <span class="mono">config/search.yaml</span>.</p><a class="btn" id="lnkRun" target="_blank" rel="noopener">Run the literature watch</a></div>
 </section>
 <div id="problems"></div>
@@ -117,6 +131,12 @@ footer{padding-block:36px;color:var(--muted);font-size:13px}
   <ol class="list" id="list"></ol>
 </main>
 <footer class="wrap" id="foot"></footer>
+<div class="sendbar" id="sendbar" hidden><div class="in">
+  <span id="sendcount"></span>
+  <span class="msg" id="sendmsg">GitHub will open a pre-filled issue; click “Create” to apply.</span>
+  <button type="button" id="btnClear">Clear</button>
+  <a id="btnSend" target="_blank" rel="noopener">Send decisions to GitHub</a>
+</div></div>
 
 <script>
 const CANDS = /*__CANDS__*/null;
@@ -157,6 +177,59 @@ $('#routes').addEventListener('click',e=>{
   render();
 });
 
+/* decisions (kept in this browser until sent) */
+const DKEY = 'ardwatch-decisions-' + (META.date||'none');
+let DEC = {};
+try{ DEC = JSON.parse(localStorage.getItem(DKEY)||'{}') || {}; }catch(e){ DEC = {}; }
+const saveDec = ()=>{ try{ localStorage.setItem(DKEY, JSON.stringify(DEC)); }catch(e){} };
+const wid = c=>(c.oa||'').split('/').pop();
+const MAXSEND = 150;
+function decisionLines(){
+  return Object.entries(DEC).slice(0, MAXSEND).map(([w,d])=>{
+    const c = CANDS.find(x=>wid(x)===w);
+    let l = `${d.d} ${w}`;
+    if(d.d==='keep'){ if(d.th) l += ` | theme=${d.th}`; if(d.rg) l += ` | region=${d.rg}`; }
+    return l + (c?`  # ${c.t.slice(0,80).replace(/[|#\n]/g,' ')}`:'');
+  });
+}
+function updateBar(){
+  const n = Object.keys(DEC).length, k = Object.values(DEC).filter(d=>d.d==='keep').length;
+  $('#sendbar').hidden = !n || !META.repo;
+  if(!n) return;
+  $('#sendcount').innerHTML = `<b>${k}</b> kept · <b>${n-k}</b> rejected`;
+  const lines = decisionLines();
+  const body = '<!-- screening decisions: one line per paper -->\n' + lines.join('\n') + '\n';
+  $('#btnSend').href = `https://github.com/${META.repo}/issues/new?title=${encodeURIComponent('Screening decisions '+META.date)}&body=${encodeURIComponent(body)}`;
+  $('#sendmsg').textContent = n>MAXSEND ? `Sends the first ${MAXSEND}; send again for the rest.` : 'GitHub will open a pre-filled issue; click “Create” to apply.';
+}
+$('#btnSend').addEventListener('click',()=>{
+  // decisions sent: forget them here (the page shows the new status after the next update)
+  Object.keys(DEC).slice(0, MAXSEND).forEach(w=>delete DEC[w]); saveDec();
+  setTimeout(()=>{ updateBar(); render(); }, 300);
+});
+$('#btnClear').addEventListener('click',()=>{ DEC = {}; saveDec(); updateBar(); render(); });
+const opt = (vals, cur, empty)=>`<option value="">${empty}</option>`+vals.map(v=>`<option${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+function decideHTML(c){
+  if(c.st!=='pending' || !META.repo) return '';
+  const w = wid(c), d = DEC[w]||{};
+  return `<div class="decide" data-w="${esc(w)}">
+    <button type="button" class="k" aria-pressed="${d.d==='keep'}">Keep</button>
+    <button type="button" class="r" aria-pressed="${d.d==='reject'}">Reject</button>
+    ${d.d==='keep'?`<select class="th" aria-label="Main theme">${opt(META.themes,d.th,'Theme…')}</select><select class="rg" aria-label="Region">${opt(META.regions,d.rg,'Region…')}</select>`:''}
+  </div>`;
+}
+$('#list').addEventListener('click',e=>{
+  const b = e.target.closest('.decide button'); if(!b) return;
+  const w = b.closest('.decide').dataset.w, want = b.classList.contains('k') ? 'keep' : 'reject';
+  if(DEC[w] && DEC[w].d===want) delete DEC[w]; else DEC[w] = {d:want, th:(DEC[w]||{}).th||'', rg:(DEC[w]||{}).rg||''};
+  saveDec(); updateBar(); render();
+});
+$('#list').addEventListener('change',e=>{
+  const s = e.target.closest('.decide select'); if(!s) return;
+  const w = s.closest('.decide').dataset.w; if(!DEC[w]) return;
+  DEC[w][s.classList.contains('th')?'th':'rg'] = s.value; saveDec(); updateBar();
+});
+
 /* list */
 CANDS.forEach(c=>c._s = norm([c.t,c.au,c.v,c.doi,c.key,c.via.join(' ')].join(' ')));
 const STATUS = {pending:'', added:'<span class="tag ok">added to the corpus</span>', rejected:'<span class="tag rej">rejected</span>', decided:'<span class="tag">decision recorded</span>'};
@@ -177,11 +250,11 @@ function render(){
         ${c.oa_url?`<a class="tag" href="${esc(c.oa_url)}" target="_blank" rel="noopener">open access PDF</a>`:''}
         ${c.oa?`<a class="tag" href="${esc(c.oa)}" target="_blank" rel="noopener">OpenAlex record</a>`:''}
         <span class="tag mono" title="Key it will get in the corpus">${esc(c.key)}</span>
-      </div>
+      </div>${decideHTML(c)}
     </div></li>`).join('') ||
     `<li class="empty" style="display:block">${CANDS.length?'No candidate matches these filters. Lower the minimum score or show all statuses.':'No candidates yet.'}</li>`;
 }
 ['#q','#fScore','#fStatus','#fCites','#fSort'].forEach(id=>$(id).addEventListener('input',render));
-render();
+render(); updateBar();
 $('#foot').textContent = META.date ? `Search window: ${META.since} → ${META.date}. Candidates come from OpenAlex (and Semantic Scholar recommendations); abstracts are on the publisher or OpenAlex page.` : '';
 </script>
