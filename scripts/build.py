@@ -202,7 +202,7 @@ for r_i, x in enumerate(ORDER, 2):
 ws.freeze_panes = 'E2'; ws.auto_filter.ref = ws.dimensions
 ws.row_dimensions[1].height = 32
 rd = wb.create_sheet('Read me')
-lines = [('Reading table – ARD corpus (Zotero library “Stage AMAP 2026”)', True),
+lines = [('Reading table – ARD corpus (Zotero library)', True),
          (f"Generated from data/corpus.json (corpus dated {META['date']}): {len(REFS)} references, one row per document, sorted by year.", False),
          ('“Cites” and “Cited by” only cover references within the corpus (“Cited by” is the inverse of “Cites”).', False),
          ('“Reading level” states what was read (metadata, abstract, full text): the Methods and Key results columns say no more than that.', False),
