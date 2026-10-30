@@ -263,6 +263,11 @@
     "date": "2026-10-30",
     "step": "translation",
     "note": "All fields and vocabularies translated into English; article titles unchanged."
+   },
+   {
+    "date": "2026-10-30",
+    "step": "integrate.py",
+    "note": "1 reference(s) added: Brighenti2026"
    }
   ]
  },
@@ -10732,6 +10737,75 @@
    "found_via": "cites seed Zarroca2021; Crossref keywords “acid rock drainage permafrost thaw”",
    "doi_verified": true,
    "note": "Only the Plain Language Summary was read; Wiley PDF not retrievable. Yukon is assumed from the author's work (“north-western North America” in the abstract). Refers to the articles Evinger et al. 2026 (AGU Advances) and Skierszkan et al. 2026a (Science)."
+  },
+  {
+   "key": "Brighenti2026",
+   "doi": "10.1002/hyp.70515",
+   "openalex": "https://openalex.org/W7155513581",
+   "url": "https://doi.org/10.1002/hyp.70515",
+   "oa_url": "https://doi.org/10.1002/hyp.70515",
+   "year": 2026,
+   "authors": [
+    "Brighenti, Stefano",
+    "Crippa, Chiara",
+    "Carturan, Luca",
+    "Lencioni, Valeria",
+    "Scotti, Alberto",
+    "Janicke, Andrina",
+    "Tolotti, Monica",
+    "Șerban, Raul‐David",
+    "Mustoni, Andrea",
+    "Armanini, Marco",
+    "Tirler, Werner",
+    "Comiti, Francesco",
+    "Colombo, Nicola"
+   ],
+   "title": "Beyond Rock Glaciers: Investigating Meltwater Contribution and Water Quality in High‐Mountain Springs From Different Landforms",
+   "venue": "Hydrological Processes",
+   "volume": "40",
+   "issue": "4",
+   "pages": "",
+   "publisher": "Wiley",
+   "doc_type": "article",
+   "peer_reviewed": true,
+   "status": "new",
+   "context": false,
+   "main_theme": "Other – to be classified",
+   "secondary_themes": [],
+   "region": "To be specified",
+   "country": "",
+   "site": "",
+   "origin": "to be specified",
+   "trigger": "to be specified",
+   "question": "",
+   "methods": "",
+   "results": "",
+   "contribution": "",
+   "reading_level": "metadata",
+   "cites": [
+    "Bearzot2023",
+    "Brighenti2023",
+    "Brighenti2024",
+    "Brighenti2025",
+    "Colombo2017",
+    "Colombo2019",
+    "Delpero2025",
+    "Dold2016",
+    "Ilyashuk2014",
+    "Jones2019",
+    "Munroe2023",
+    "Nickus2023",
+    "Nordstrom2008",
+    "Seelig2025",
+    "Skierszkan2024b",
+    "Thies2007",
+    "Tolotti2020",
+    "Wanner2023",
+    "Zarroca2021"
+   ],
+   "found_via": "literature watch of 2026-10-30: query \"acid rock drainage\" AND (glacier OR glacial OR proglacial) ; query \"acid rock drainage\" AND permafrost ; query \"rock glacier\" AND (sulfate OR sulphate OR acid OR metals) ; query \"rock glacier\" AND (nickel OR \"trace elements\") ; cites Zarroca2021 ; cites Thies2007 ; cites Colombo2017 ; cites Wanner2023 ; cites Brighenti2024",
+   "doi_verified": true,
+   "note": "Added by integrate.py: card to be completed (question, methods, results, contribution)."
   }
  ]
 }
