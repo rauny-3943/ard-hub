@@ -59,4 +59,4 @@ follow_citations_of:
 semantic_scholar_recommendations: true
 
 # Minimum score for a candidate to appear in the report (see README, "Literature watch").
-min_score: 1
+min_score: 2
