@@ -1,0 +1,187 @@
+<title>ARD Literature Watch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+/* Layout: same visual system as the literature map; one reading column, sticky filters, a ranked list of candidates. */
+:root{
+  --bg:#f1f2ef; --surface:#fbfbf9; --ink:#1b2220; --muted:#55605b; --line:#d5dad5; --edge:#a3aba6;
+  --accent:#8c2f1b; --accent-soft:#f2e1d9; --bar:#2a78d6; --ok:#1d7a4f; --ok-soft:#dcefe4;
+  --f-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121615; --surface:#1a1f1e; --ink:#e4e8e5; --muted:#9aa49f; --line:#2d3533; --edge:#5b6762;
+  --accent:#e58e6c; --accent-soft:#3a241b; --bar:#3987e5; --ok:#5cc28f; --ok-soft:#173326; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#121615; --surface:#1a1f1e; --ink:#e4e8e5; --muted:#9aa49f; --line:#2d3533; --edge:#5b6762;
+  --accent:#e58e6c; --accent-soft:#3a241b; --bar:#3987e5; --ok:#5cc28f; --ok-soft:#173326; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2{font-family:var(--f-display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:20px;font-weight:600}
+.eyebrow{font:500 11.5px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+.topnav{display:flex;flex-wrap:wrap;gap:6px 18px;padding-top:18px;font-size:13.5px}
+.topnav a{text-decoration:none;font-weight:500}
+.topnav a[aria-current]{color:var(--ink);border-bottom:2px solid var(--accent)}
+header.top{padding-block:28px 18px;display:grid;gap:12px}
+.lede{max-width:70ch;font-size:16px;margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px}
+.facts b{font-family:var(--f-display);font-size:24px;font-weight:700;margin-right:4px;font-variant-numeric:tabular-nums}
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px 28px;padding-block:8px 24px;border-bottom:1px solid var(--line)}
+.howto > div{min-width:0;display:grid;gap:6px;align-content:start}
+.howto p{margin:0;font-size:14px;color:var(--muted);max-width:52ch}
+.btn{font:500 13.5px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:7px 12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;justify-self:start;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.warn{font-size:13.5px;background:var(--accent-soft);border-radius:4px;padding:8px 11px;margin-top:14px}
+section.block{padding-block:26px 6px;display:grid;gap:10px}
+section.block > *{min-width:0}
+.routes{display:grid;gap:6px;max-width:760px}
+.route{all:unset;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:2px 10px;cursor:pointer;padding:3px 4px;border-radius:4px}
+.route:hover,.route[aria-pressed="true"]{background:var(--surface)}
+.route:focus-visible{outline:2px solid var(--accent)}
+.route .lab{font-size:13px;overflow-wrap:anywhere}
+.route .n{font:500 12.5px var(--f-mono);text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;grid-row:span 2;align-self:center}
+.route .track{height:8px;background:var(--line);border-radius:0 4px 4px 0;overflow:hidden}
+.route .fill{height:100%;background:var(--bar);border-radius:0 4px 4px 0}
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-block:1px solid var(--line);padding-block:10px;margin-top:24px}
+.frow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.frow input[type=search]{flex:1 1 220px;min-width:0;font:14px var(--f-body);padding:7px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink)}
+.frow select{font:13.5px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);max-width:100%}
+.frow label{font-size:13.5px;display:inline-flex;gap:6px;align-items:center}
+.count{font:500 13px var(--f-mono);color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums}
+ol.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+ol.list > li{border-bottom:1px solid var(--line);padding:12px 4px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:4px 14px}
+.score{font:600 18px var(--f-mono);text-align:center;border:1px solid var(--line);border-radius:var(--r);padding:4px 0;align-self:start;font-variant-numeric:tabular-nums}
+.score small{display:block;font:500 9.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.score.hi{border-color:var(--accent);color:var(--accent)}
+.ti{font-weight:500;font-size:15.5px}
+.ti a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--edge)}
+.ti a:hover{border-color:var(--accent)}
+.me{font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:4px}
+.tag{font:500 11px var(--f-mono);border:1px solid var(--line);border-radius:3px;padding:0 5px;color:var(--muted);max-width:100%;overflow-wrap:anywhere}
+.tag.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.tag.rej{text-decoration:line-through}
+.tag.cite{border-color:var(--accent);color:var(--accent)}
+.empty{padding:18px 4px;color:var(--muted)}
+footer{padding-block:36px;color:var(--muted);font-size:13px}
+@media (max-width:700px){ .filters{position:static} ol.list > li{grid-template-columns:40px minmax(0,1fr)} }
+</style>
+<!--BODY-->
+<div class="wrap">
+<nav class="topnav" aria-label="Pages"><a href="index.html">Literature map</a><a href="candidates.html" aria-current="page">New candidates</a></nav>
+<header class="top">
+  <div class="eyebrow">Weekly literature watch · acid rock drainage</div>
+  <h1>New candidates</h1>
+  <p class="lede" id="lede"></p>
+  <div class="facts" id="facts"></div>
+</header>
+
+<section class="howto" aria-label="How to screen the candidates">
+  <div><h2>Read the score</h2><p>Score = number of searches that found the paper + 2 for each corpus paper it cites. Papers that cite the corpus are usually the most relevant; a score of 1 is often noise.</p></div>
+  <div><h2>Keep or reject</h2><p>Open the screening sheet on GitHub, write <span class="mono">keep</span> or <span class="mono">reject</span> in the <span class="mono">decision</span> column, then commit. Kept papers join the map within a few minutes; rejected ones never come back.</p><a class="btn" id="lnkEdit" target="_blank" rel="noopener">Open the screening sheet</a></div>
+  <div><h2>Search again</h2><p>The watch runs every Monday. You can also run it now, or change the queries and followed papers in <span class="mono">config/search.yaml</span>.</p><a class="btn" id="lnkRun" target="_blank" rel="noopener">Run the literature watch</a></div>
+</section>
+<div id="problems"></div>
+
+<section class="block" id="sources" aria-labelledby="hSources">
+  <h2 id="hSources">Where the candidates come from</h2>
+  <p class="muted" style="margin:0;font-size:14px">Number of candidates found by each search. Click a line to show only those candidates; a query that brings many low-score papers is a good one to rephrase.</p>
+  <div class="routes" id="routes"></div>
+</section>
+</div>
+
+<div class="filters"><div class="wrap">
+  <div class="frow" role="search">
+    <input type="search" id="q" placeholder="Search: title, author, journal…" aria-label="Text search">
+    <select id="fScore" aria-label="Minimum score"><option value="1">All scores</option><option value="2" selected>Score ≥ 2</option><option value="3">Score ≥ 3</option><option value="5">Score ≥ 5</option></select>
+    <select id="fStatus" aria-label="Status"><option value="pending" selected>Waiting for a decision</option><option value="all">All statuses</option><option value="added">Added to the corpus</option><option value="rejected">Rejected</option><option value="decided">Decision recorded</option></select>
+    <label><input type="checkbox" id="fCites"> Cites the corpus</label>
+    <select id="fSort" aria-label="Sort"><option value="score">Highest score first</option><option value="year">Newest first</option></select>
+    <span class="count" id="count"></span>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <ol class="list" id="list"></ol>
+</main>
+<footer class="wrap" id="foot"></footer>
+
+<script>
+const CANDS = /*__CANDS__*/null;
+const META = /*__META__*/null;
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const fmtDate = d=>d?new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'';
+
+const pending = CANDS.filter(c=>c.st==='pending').length;
+if(!META.date){
+  $('#lede').textContent = 'No literature watch has run yet. Run it once from the button below; the candidates it finds will appear here.';
+}else{
+  $('#lede').textContent = `Papers published since ${fmtDate(META.since)} that match the search queries or cite the corpus, and are not in the corpus yet. Last search: ${fmtDate(META.date)}.`;
+  $('#facts').innerHTML = `<span><b>${CANDS.length}</b>candidates</span><span><b>${pending}</b>waiting for a decision</span>`+
+    `<span><b>${CANDS.filter(c=>c.cites.length).length}</b>cite the corpus</span><span><b>${CANDS.filter(c=>c.oa_url).length}</b>open access</span>`;
+}
+if(META.repo){
+  $('#lnkEdit').href = `https://github.com/${META.repo}/edit/main/data/candidates/to_screen.csv`;
+  $('#lnkRun').href = `https://github.com/${META.repo}/actions/workflows/watch.yml`;
+}else{ $('#lnkEdit').hidden = true; $('#lnkRun').hidden = true; }
+if(META.errors && META.errors.length)
+  $('#problems').innerHTML = `<div class="warn"><b>The last search reported problems:</b> ${META.errors.map(esc).join(' · ')}</div>`;
+
+/* where the candidates come from */
+let route = '';
+const routeCounts = {};
+CANDS.forEach(c=>c.via.forEach(v=>routeCounts[v]=(routeCounts[v]||0)+1));
+const routes = Object.entries(routeCounts).sort((a,b)=>b[1]-a[1]);
+const maxR = routes.length?routes[0][1]:1;
+$('#routes').innerHTML = routes.length ? routes.map(([v,n])=>`<button class="route" type="button" aria-pressed="false" data-v="${esc(v)}">
+  <span class="lab">${esc(v)}</span><span class="n">${n}</span><span class="track"><span class="fill" style="display:block;width:${Math.max(2,100*n/maxR)}%"></span></span></button>`).join('')
+  : '<p class="muted">Nothing yet.</p>';
+$('#routes').addEventListener('click',e=>{
+  const b = e.target.closest('.route'); if(!b) return;
+  route = route===b.dataset.v ? '' : b.dataset.v;
+  document.querySelectorAll('.route').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.v===route)));
+  render();
+});
+
+/* list */
+CANDS.forEach(c=>c._s = norm([c.t,c.au,c.v,c.doi,c.key,c.via.join(' ')].join(' ')));
+const STATUS = {pending:'', added:'<span class="tag ok">added to the corpus</span>', rejected:'<span class="tag rej">rejected</span>', decided:'<span class="tag">decision recorded</span>'};
+function render(){
+  const q = norm($('#q').value).split(/\s+/).filter(Boolean);
+  const minS = +$('#fScore').value, st = $('#fStatus').value, cites = $('#fCites').checked, sort = $('#fSort').value;
+  const rows = CANDS.filter(c=>c.s>=minS && (st==='all'||c.st===st) && (!cites||c.cites.length) && (!route||c.via.includes(route)) && q.every(w=>c._s.includes(w)))
+    .sort(sort==='year' ? (a,b)=>(b.y||0)-(a.y||0)||b.s-a.s : (a,b)=>b.s-a.s||(b.y||0)-(a.y||0));
+  $('#count').textContent = `${rows.length} / ${CANDS.length}`;
+  $('#list').innerHTML = rows.map(c=>`<li>
+    <div class="score${c.s>=3?' hi':''}" title="score">${c.s}<small>score</small></div>
+    <div>
+      <div class="ti">${c.doi?`<a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">${esc(c.t)}</a>`:esc(c.t)}</div>
+      <div class="me">${esc(c.au)}${c.v?' · <i>'+esc(c.v)+'</i>':''}${c.y?' · '+c.y:''}</div>
+      <div class="chips">${STATUS[c.st]||''}
+        ${c.cites.map(k=>`<a class="tag cite" href="index.html#${esc(k)}" title="Opens this corpus paper on the map">cites ${esc(META.labels[k]||k)}</a>`).join('')}
+        ${c.via.slice(0,3).map(v=>`<span class="tag">${esc(v)}</span>`).join('')}${c.via.length>3?`<span class="tag">+${c.via.length-3} searches</span>`:''}
+        ${c.oa_url?`<a class="tag" href="${esc(c.oa_url)}" target="_blank" rel="noopener">open access PDF</a>`:''}
+        ${c.oa?`<a class="tag" href="${esc(c.oa)}" target="_blank" rel="noopener">OpenAlex record</a>`:''}
+        <span class="tag mono" title="Key it will get in the corpus">${esc(c.key)}</span>
+      </div>
+    </div></li>`).join('') ||
+    `<li class="empty" style="display:block">${CANDS.length?'No candidate matches these filters. Lower the minimum score or show all statuses.':'No candidates yet.'}</li>`;
+}
+['#q','#fScore','#fStatus','#fCites','#fSort'].forEach(id=>$(id).addEventListener('input',render));
+render();
+$('#foot').textContent = META.date ? `Search window: ${META.since} → ${META.date}. Candidates come from OpenAlex (and Semantic Scholar recommendations); abstracts are on the publisher or OpenAlex page.` : '';
+</script>

@@ -1,15 +1,20 @@
-# When you edit data/candidates/to_screen.csv on a watch branch (from the pull request), this adds the "keep"
-# rows to the corpus, files the "reject" rows, rebuilds, and pushes to the same branch.
+# Runs when you edit data/candidates/to_screen.csv on GitHub: adds the "keep" rows to the corpus,
+# files the "reject" rows so they never come back, checks everything and refreshes the website.
 name: Integrate screening
 
 on:
   push:
-    branches: ["watch/**"]
+    branches: [main]
     paths: ["data/candidates/to_screen.csv"]
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write
+
+concurrency:
+  group: corpus-data
+  cancel-in-progress: false
 
 jobs:
   integrate:
@@ -26,12 +31,19 @@ jobs:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
         run: python scripts/integrate.py
-      - run: python scripts/build.py
-      - run: python -m pytest -q tests
-      - name: Push to the branch
+      - name: Check the corpus
+        run: |
+          python scripts/build.py
+          python -m pytest -q tests
+      - name: Save the corpus
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
-          git commit -m "Integrate literature watch screening" || echo "Nothing to integrate"
+          git commit -m "Add screened papers to the corpus" || echo "Nothing to integrate"
+          git pull --rebase
           git push
+      - name: Refresh the website
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run publish.yml --ref main

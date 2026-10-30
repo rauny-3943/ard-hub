@@ -122,18 +122,32 @@ table.reg .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowr
 footer{padding-block:40px;color:var(--muted);font-size:13px}
 @media (max-width:700px){ .filters{position:static} }
 @media (max-width:600px){ ol.list button{grid-template-columns:40px 12px minmax(0,1fr)} .syn p,.syn li{font-size:16px} }
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px 28px;padding-block:6px 26px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.howto > div{min-width:0;display:grid;gap:4px;align-content:start}
+.howto h2{font-size:18px}
+.howto p{margin:0;font-size:14px;color:var(--muted);max-width:52ch}
+.topnav{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding-top:18px;font-size:13.5px}
+.topnav a{text-decoration:none;font-weight:500}
+.topnav a[aria-current]{color:var(--ink);border-bottom:2px solid var(--accent)}
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
 
 <div id="tip" role="tooltip"></div>
 
 <div class="wrap">
+<nav class="topnav" aria-label="Pages"><a href="index.html" aria-current="page">Literature map</a><a href="candidates.html">New candidates</a><a href="#synthesis">Synthesis</a><a href="#dl">Downloads</a></nav>
 <header class="top">
   <div class="eyebrow">Zotero library “Stage AMAP 2026” · acid rock drainage</div>
   <h1>ARD Literature Map</h1>
   <p class="lede" id="scope"></p>
   <div class="facts" id="facts"></div>
 </header>
+
+<section class="howto" aria-label="How to use this map">
+  <div><h2>Explore</h2><p>Type in the search box or filter by theme, region, country, origin and reading level. The timeline, the citation graph and the list all follow the filters.</p></div>
+  <div><h2>Read a card</h2><p>Click a dot or a title to open its card: question, site, methods, key results, and the papers it builds on or that follow it up. The reading level says what was actually read.</p></div>
+  <div><h2>Find new papers</h2><p>A weekly search lists recent papers that are not in the corpus yet. See them, with their score, on the <a href="candidates.html">New candidates</a> page, and mark the ones to keep.</p></div>
+</section>
 
 <div class="about">
   <div class="bars">
@@ -142,7 +156,7 @@ footer{padding-block:40px;color:var(--muted);font-size:13px}
   </div>
   <div>
     <details><summary>How the corpus was built</summary><ul id="choices"></ul></details>
-    <details><summary>Choices made for these deliverables</summary><ul id="choices2"></ul></details>
+    <details><summary>Build notes</summary><ul id="choices2"></ul></details>
     <details><summary>Limitations</summary><ul id="limitations"></ul></details>
     <details><summary>Sources searched</summary><ul id="sources"></ul></details>
   </div>
@@ -173,7 +187,7 @@ footer{padding-block:40px;color:var(--muted);font-size:13px}
 </div></div>
 
 <main class="wrap">
-<section class="block" id="frise">
+<section class="block" id="timeline">
   <div class="eyebrow">Figure 1</div>
   <h2>Timeline</h2>
   <p class="sub">One dot per reference, stacked by publication year and coloured by main theme. References published before 1990 are grouped in the first column. Click a dot to open its card.</p>
@@ -181,7 +195,7 @@ footer{padding-block:40px;color:var(--muted);font-size:13px}
   <div class="fig"><svg id="svgT" role="img" aria-label="Timeline of references"></svg></div>
 </section>
 
-<section class="block" id="graphe">
+<section class="block" id="graph">
   <div class="eyebrow">Figure 2</div>
   <h2>Who cites whom in the corpus</h2>
   <p class="sub">Each line joins two corpus references where one cites the other (citations found through OpenAlex and Crossref). Horizontal position: year; bands: main theme; size: number of citations received within the corpus. Hovering over a reference shows the works it builds on (solid lines) and the works that follow it up (dashed lines).</p>
@@ -189,7 +203,7 @@ footer{padding-block:40px;color:var(--muted);font-size:13px}
   <div class="fig"><svg id="svgG" role="img" aria-label="Citation graph within the corpus"></svg></div>
 </section>
 
-<section class="block" id="articles">
+<section class="block" id="references">
   <div class="listhead">
     <div><div class="eyebrow">References</div><h2>Reference cards</h2></div>
     <select id="sort" aria-label="Sort">
@@ -202,7 +216,7 @@ footer{padding-block:40px;color:var(--muted);font-size:13px}
   <ol class="list" id="list"></ol>
 </section>
 
-<section class="block" id="synthese">
+<section class="block" id="synthesis">
   <div class="eyebrow">Synthesis</div>
   <h2>What this literature says</h2>
   <p class="sub">Written from the corpus fields (question, methods, results, contribution) and within the limits of their reading level. Clickable names open the matching card.</p>
@@ -229,12 +243,12 @@ const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':
 const css = v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 /* ---------- header ---------- */
-$('#scope').textContent = META.scope;
+$('#scope').textContent = 'What is known about natural acid rock drainage in mountain and cold regions: where it occurs, what triggers it, and what it does to water, soils and living things. Focus on the Pyrenees and the Cordillera Blanca.';
 const nNew = DATA.filter(d=>d.st==='new').length, nIni = DATA.length-nNew;
 const nFull = DATA.filter(d=>d.nl==='full text').length;
 const nEdges = DATA.reduce((s,d)=>s+d.c.length,0);
-$('#facts').innerHTML = `<span><b>${DATA.length}</b>references</span><span><b>${nIni}</b>from the initial bibliography</span><span><b>${nNew}</b>new</span><span><b>${nEdges}</b>internal citation links</span><span class="muted" style="align-self:end">Corpus of ${new Date(META.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · ${META.nq} queries</span>`;
-for (const [id,arr] of [['#choices',META.choices],['#choices2',META.notes2],['#limitations',META.limitations],['#sources',META.sources]])
+$('#facts').innerHTML = `<span><b>${DATA.length}</b>references</span><span><b>${nIni}</b>from the initial bibliography</span><span><b>${nNew}</b>new</span><span><b>${nEdges}</b>internal citation links</span><span class="muted" style="align-self:end">Corpus of ${new Date(META.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</span>`;
+for (const [id,arr] of [['#choices',['Scope: '+META.scope, ...META.choices]],['#choices2',META.notes2],['#limitations',META.limitations],['#sources',META.sources]])
   $(id).innerHTML = arr.map(s=>`<li>${esc(s)}</li>`).join('');
 function stackBar(bar,lab,groups){
   const tot = groups.reduce((s,g)=>s+g.n,0);
@@ -295,7 +309,7 @@ function showTip(ev,d){
 }
 const hideTip = ()=>tip.style.opacity=0;
 
-/* ---------- frise ---------- */
+/* ---------- timeline ---------- */
 function drawTimeline(){
   const cols = ['<1990']; for(let y=1990;y<=2026;y++) cols.push(String(y));
   const colOf = d=>d.y<1990?'<1990':String(d.y);
@@ -303,7 +317,7 @@ function drawTimeline(){
   const famIdx = Object.fromEntries(FAMS.map((f,i)=>[f,i]));
   const maxN = d3.max(cols,c=>(groups.get(c)||[]).length);
   const step = 11, padL=34, padR=12, padT=14, padB=34;
-  const W = Math.max(860, $('#frise .fig').clientWidth);
+  const W = Math.max(860, $('#timeline .fig').clientWidth);
   const H = padT + maxN*step + padB;
   const x = d3.scaleBand().domain(cols).range([padL,W-padR]).padding(.1);
   const svg = d3.select('#svgT').attr('width',W).attr('height',H).attr('viewBox',`0 0 ${W} ${H}`);

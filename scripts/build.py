@@ -317,7 +317,52 @@ cut = page.index('<div id="tip"')
     + page[:cut] + '\n</head>\n<body>\n' + page[cut:] + '\n</body>\n</html>\n', encoding='utf-8')
 (OUT / '.nojekyll').write_text('')
 
-# ---------- 5. consistency check ----------
+# ---------- 5. candidates page (latest literature watch) ----------
+import os
+def wrap_page(fragment, marker):
+    cut = fragment.index(marker)
+    return ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
+            '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
+            '<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}'
+            'img{max-width:100%}[hidden]{display:none!important}</style>\n'
+            + fragment[:cut] + '\n</head>\n<body>\n' + fragment[cut:] + '\n</body>\n</html>\n')
+
+CAND = DATA / 'candidates'
+runs = sorted(p for p in CAND.glob('*.json') if re.fullmatch(r'\d{4}-\d{2}-\d{2}', p.stem))
+run = json.loads(runs[-1].read_text(encoding='utf-8')) if runs else {}
+pending_ids, decided_ids = set(), set()
+if (CAND / 'to_screen.csv').exists():
+    with open(CAND / 'to_screen.csv', encoding='utf-8-sig', newline='') as f:
+        for l in csv.DictReader(f):
+            (decided_ids if (l.get('decision') or '').strip() else pending_ids).add(l.get('openalex', ''))
+rejected = set()
+if (CAND / 'rejected.txt').exists():
+    rejected = {l.strip().lower() for l in (CAND / 'rejected.txt').read_text(encoding='utf-8').splitlines() if l.strip()}
+corpus_oa = {x['openalex'] for x in REFS if x.get('openalex')}
+corpus_dois = {x['doi'].lower() for x in REFS if x.get('doi')}
+cands = []
+for c in run.get('candidates', []):
+    oid, doi = c.get('openalex', ''), (c.get('doi') or '').lower()
+    if oid in corpus_oa or (doi and doi in corpus_dois): st = 'added'
+    elif (doi and doi in rejected) or oid.rsplit('/', 1)[-1].lower() in rejected: st = 'rejected'
+    elif oid in decided_ids: st = 'decided'
+    else: st = 'pending'
+    cands.append({'s': c['score'], 'y': c.get('year'), 't': c.get('title', ''), 'au': c.get('authors', ''), 'v': c.get('venue', ''),
+                  'doi': c.get('doi', ''), 'oa': oid, 'oa_url': c.get('open_access', ''), 'key': c.get('proposed_key', ''),
+                  'via': [v for v in (c.get('found_via') or '').split(' ; ') if v],
+                  'cites': [k for k in (c.get('cites_in_corpus') or '').split('; ') if k], 'st': st})
+cmeta = {'date': run.get('date', ''), 'since': run.get('since', ''), 'errors': run.get('errors', []),
+         'repo': os.environ.get('GITHUB_REPOSITORY', ''),
+         'labels': {x['key']: x['label'] for x in REFS}}
+ctpl = (ROOT / 'templates' / 'candidates_template.html').read_text(encoding='utf-8')
+cpage = (ctpl.replace('/*__CANDS__*/null', json.dumps(cands, ensure_ascii=False).replace('</', '<\\/'))
+             .replace('/*__META__*/null', json.dumps(cmeta, ensure_ascii=False).replace('</', '<\\/')))
+(FRAG / 'candidates_fragment.html').write_text(cpage.replace('<!--BODY-->', ''), encoding='utf-8')
+(OUT / 'candidates.html').write_text(wrap_page(cpage, '<!--BODY-->').replace('<!--BODY-->', ''), encoding='utf-8')
+print(f"Candidates page: {len(cands)} candidates from the watch of {run.get('date') or '(none yet)'}, "
+      f"{sum(c['st'] == 'pending' for c in cands)} waiting for a decision.")
+
+# ---------- 6. consistency check ----------
 import openpyxl
 xl = openpyxl.load_workbook(OUT / 'ARD_reading_table.xlsx')['Reading table']
 xl_keys = {r[0] for r in xl.iter_rows(min_row=2, values_only=True)}

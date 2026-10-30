@@ -30,7 +30,7 @@ Strict rules:
 
 
 def card(r: dict, size: int = 420) -> str:
-    content = r.get("results") or r.get("contribution") or r.get("openalex_abstract", "")[:size]
+    content = r.get("results") or r.get("contribution") or "(not read yet: mention the topic only)"
     return (f"[[{r['key']}]] {r['year']} · {r['region']} · {r['main_theme']} · reading level: {r['reading_level']}\n"
             f"Title: {r['title']}\nResults/contribution: {content[:size]}\n")
 

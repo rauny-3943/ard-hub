@@ -1,6 +1,6 @@
-# Weekly literature watch: finds new publications and proposes the candidates in a pull request.
-# To screen: in the pull request, edit data/candidates/to_screen.csv (decision column = keep / reject).
-# The "Integrate screening" workflow then adds the kept references to the corpus, on the same branch.
+# Weekly literature watch: finds new publications that are not in the corpus, saves them in data/candidates/
+# and refreshes the "New candidates" page. To screen them, edit data/candidates/to_screen.csv on GitHub
+# (decision column = keep / reject): the "Integrate screening" workflow does the rest.
 name: Literature watch
 
 on:
@@ -14,7 +14,11 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+  actions: write
+
+concurrency:
+  group: corpus-data
+  cancel-in-progress: false
 
 jobs:
   watch:
@@ -39,21 +43,15 @@ jobs:
           else
             python scripts/search.py
           fi
-      - name: Propose the candidates
-        if: steps.search.outputs.new != '0'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: watch/${{ steps.search.outputs.date }}
-          commit-message: "Literature watch ${{ steps.search.outputs.date }}: ${{ steps.search.outputs.new }} candidates"
-          title: "Literature watch ${{ steps.search.outputs.date }}: ${{ steps.search.outputs.new }} candidates to screen"
-          body-path: ${{ steps.search.outputs.report }}
-          labels: watch
-          add-paths: data/candidates/**
-      - name: Record the run date when nothing is new
-        if: steps.search.outputs.new == '0'
+      - name: Save the candidates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/candidates/state.json
-          git commit -m "Literature watch ${{ steps.search.outputs.date }}: no new candidate" || true
+          git add data/candidates/
+          git commit -m "Literature watch ${{ steps.search.outputs.date }}: ${{ steps.search.outputs.new }} new candidates" || echo "Nothing new"
+          git pull --rebase
           git push
+      - name: Refresh the website
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run publish.yml --ref main

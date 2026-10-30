@@ -53,3 +53,10 @@ def test_synthesis_cites_existing_keys():
     syn = (R / "data" / "synthesis.html").read_text(encoding="utf-8")
     unknown = set(re.findall(r"\[\[([A-Za-z0-9]+)\]\]", syn)) - KEYS
     assert not unknown, f"unknown keys in the synthesis: {unknown}"
+
+
+def test_candidates_page_built():
+    page = (R / "site" / "candidates.html").read_text(encoding="utf-8")
+    cands = json.loads(re.search(r"const CANDS = (\[.*?\]);\n", page, re.S).group(1))
+    for c in cands:
+        assert set(c["cites"]) <= KEYS

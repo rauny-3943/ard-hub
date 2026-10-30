@@ -10,31 +10,32 @@ contact_email: ""
 default_since: "2026-10-01"
 
 # Maximum number of results kept per query or per followed paper.
-max_per_query: 40
+max_per_query: 25
 
 # OpenAlex work types kept (article, review, book-chapter, preprint, dissertation, report…).
 types: [article, review, book-chapter, preprint, dissertation, report]
 
-# 1) Full-text queries (title + abstract) on OpenAlex.
+# 1) Queries on OpenAlex, matched against titles and abstracts only.
+#    Double quotes = exact phrase; words side by side must all appear (AND); OR and NOT are allowed.
 queries:
-  - "acid rock drainage glacier"
-  - "acid rock drainage permafrost"
-  - "acid rock drainage rock glacier"
-  - "natural acid rock drainage"
-  - "acid drainage proglacial"
-  - "sulfide oxidation glacier retreat water quality"
-  - "rock glacier spring nickel sulfate"
-  - "permafrost thaw stream acidification metals"
-  - "Cordillera Blanca water quality metals"
-  - "Cordillera Blanca acid"
-  - "Pyrenees acid rock drainage"
-  - "Pyrenees ferricrete"
-  - "drenaje ácido de roca glaciar"
-  - "drenaje ácido Cordillera Blanca"
-  - "drainage rocheux acide"
-  - "proglacial soil acidification pyrite"
-  - "acid rock drainage vegetation"
-  - "acid rock drainage plant traits"
+  - '"acid rock drainage" AND (glacier OR glacial OR proglacial)'
+  - '"acid rock drainage" AND permafrost'
+  - '"rock glacier" AND (sulfate OR sulphate OR acid OR metals)'
+  - '"natural acid rock drainage"'
+  - '"acid drainage" AND (proglacial OR deglaciated OR deglaciation)'
+  - '("sulfide oxidation" OR "pyrite oxidation") AND (glacier OR permafrost OR alpine)'
+  - '"rock glacier" AND (nickel OR "trace elements")'
+  - '"permafrost thaw" AND (acidification OR metals OR "rusting")'
+  - '"Cordillera Blanca" AND ("water quality" OR metals OR acid)'
+  - '("Rio Santa" OR "Río Santa" OR Ancash OR Áncash) AND (acid OR metals) AND glacier'
+  - '(Pyrenees OR Pyrenean OR Pirineos) AND ("acid drainage" OR "acid rock drainage" OR sulfate OR metals)'
+  - 'ferricrete AND (mountain OR alpine OR Pyrenees)'
+  - '"drenaje ácido" AND (glaciar OR roca)'
+  - '"drenaje ácido" AND ("Cordillera Blanca" OR Ancash OR Áncash)'
+  - '"drainage rocheux acide" OR "drainage minier acide"'
+  - '(proglacial OR deglaciated) AND soil AND (acid OR pyrite OR sulfide)'
+  - '("acid rock drainage" OR "acid drainage") AND (vegetation OR plants OR wetland OR bofedal)'
+  - '("acid rock drainage" OR "acid drainage" OR "soil acidification") AND "functional traits"'
 
 # 2) Followed papers: the watch looks for new works that cite them (corpus keys).
 follow_citations_of:

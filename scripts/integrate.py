@@ -21,7 +21,7 @@ import sys
 import urllib.parse
 
 from common import (CANDIDATES, get_json, last_first, load_config, load_corpus, new_key, norm_doi,
-                    openalex_abstract, openalex_params, save_corpus)
+                    openalex_params, save_corpus)
 
 OA = "https://api.openalex.org/works"
 TYPES = {"article": "article", "review": "article", "book-chapter": "chapter", "book": "book",
@@ -65,7 +65,6 @@ def entry(w: dict, keys: set[str], corpus_oa: dict, extra: dict, via: str) -> di
         "found_via": via, "doi_verified": bool(doi) and doi_resolves(doi),
         "note": "Added by integrate.py: card to be completed (question, methods, results, contribution)."
                 + ("" if theme in MAIN_THEMES or theme.startswith("Other – ") else " Theme not in the list, to be checked."),
-        "openalex_abstract": openalex_abstract(w.get("abstract_inverted_index")),
     }
 
 

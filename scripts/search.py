@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Literature monitoring: find new publications (OpenAlex + Semantic Scholar) that are not in the corpus.
 
+Queries are matched against titles and abstracts only (OpenAlex search.title_and_abstract);
+put phrases in double quotes and combine terms with AND / OR / NOT.
+Abstracts are not stored: the candidates page links to the publisher and OpenAlex records.
+
 Outputs (in data/candidates/):
   YYYY-MM-DD.md     readable report, sorted by score
   YYYY-MM-DD.json   full data for the run
@@ -22,11 +26,11 @@ import os
 import sys
 
 from common import (CANDIDATES, BudgetExhausted, get_json, last_first, load_config, load_corpus, new_key,
-                    norm_doi, norm_title, openalex_abstract, openalex_params, post_json)
+                    norm_doi, norm_title, openalex_params, post_json)
 
 OA = "https://api.openalex.org/works"
 SELECT = ("id,doi,display_name,publication_year,publication_date,type,authorships,primary_location,"
-          "biblio,abstract_inverted_index,referenced_works,open_access,cited_by_count")
+          "biblio,referenced_works,open_access,cited_by_count")
 COLUMNS = ["decision", "score", "proposed_key", "year", "title", "authors", "venue", "doi", "openalex", "found_via",
            "cites_in_corpus", "open_access", "main_theme", "secondary_themes", "region", "country", "site",
            "origin", "trigger", "search_date"]
@@ -97,7 +101,7 @@ def main() -> int:
 
     date_filter = f"from_publication_date:{since},type:{types}"
     for q in cfg.get("queries", []):
-        list_works({"search": q, "filter": date_filter}, f"query “{q}”")
+        list_works({"search.title_and_abstract": q, "filter": date_filter}, f"query {q}")
     for k in cfg.get("follow_citations_of", []):
         ref = next((r for r in corpus if r["key"] == k), None)
         if not ref or not ref.get("openalex"):
@@ -141,7 +145,6 @@ def main() -> int:
             "cites_in_corpus": "; ".join(cites), "open_access": (w.get("open_access") or {}).get("oa_url") or "",
             "main_theme": "", "secondary_themes": "", "region": "", "country": "", "site": "", "origin": "",
             "trigger": "", "search_date": today,
-            "_abstract": openalex_abstract(w.get("abstract_inverted_index")),
         })
     rows.sort(key=lambda l: (-l["score"], -(l["year"] or 0)))
 
@@ -164,7 +167,7 @@ def main() -> int:
     md = [f"# Literature watch – {today}", "",
           f"Publications since {since}. {len(new)} new candidates (not in the corpus nor in the rejected list).", "",
           "To screen: open `data/candidates/to_screen.csv`, write `keep` or `reject` in the `decision` column "
-          "(optionally fill in theme, region, country…), then run `python scripts/integrate.py`.", ""]
+          "(optionally fill in theme, region, country…) and commit: kept papers are added to the corpus automatically.", ""]
     if errors:
         md += ["## Problems", ""] + [f"- {e}" for e in errors] + [""]
     md += ["| Score | Year | Reference | Found via | Cites in corpus |", "|---:|---:|---|---|---|"]
