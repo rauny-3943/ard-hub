@@ -1,0 +1,468 @@
+<title>ARD Literature Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+/* Layout: single reading column, sticky filter bar, full-width figure panels, reference card in a side drawer. */
+:root{
+  --bg:#f1f2ef; --surface:#fbfbf9; --ink:#1b2220; --muted:#55605b; --line:#d5dad5; --edge:#a3aba6;
+  --accent:#8c2f1b; --accent-soft:#f2e1d9;
+  --geo:#2a78d6; --hyd:#eb6834; --sol:#1baf7a; --aut:#7b847f;
+  --f-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121615; --surface:#1a1f1e; --ink:#e4e8e5; --muted:#9aa49f; --line:#2d3533; --edge:#5b6762;
+  --accent:#e58e6c; --accent-soft:#3a241b;
+  --geo:#3987e5; --hyd:#d95926; --sol:#199e70; --aut:#8e9893; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#121615; --surface:#1a1f1e; --ink:#e4e8e5; --muted:#9aa49f; --line:#2d3533; --edge:#5b6762;
+  --accent:#e58e6c; --accent-soft:#3a241b;
+  --geo:#3987e5; --hyd:#d95926; --sol:#199e70; --aut:#8e9893; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:26px;font-weight:600}
+h3{font-size:21px;font-weight:600}
+h4{font-size:17px;font-weight:600}
+.eyebrow{font:500 11.5px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+.muted{color:var(--muted)}
+header.top{padding-block:36px 20px;display:grid;gap:14px}
+.lede{max-width:72ch;font-size:16px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px}
+.facts b{font-family:var(--f-display);font-size:24px;font-weight:700;margin-right:4px;font-variant-numeric:tabular-nums}
+.about{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;padding-block:8px 24px}
+.about > div{min-width:0}
+details{border-top:1px solid var(--line);padding-block:8px}
+details summary{cursor:pointer;font-weight:600}
+details ul{margin:8px 0 0;padding-left:18px;font-size:13.5px}
+details li{margin-bottom:6px}
+.bars{display:grid;gap:12px}
+.bar{display:flex;height:14px;border-radius:3px;overflow:hidden;gap:2px;background:var(--surface)}
+.bar span{display:block;height:100%}
+.barlab{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted);margin-top:4px}
+.barlab i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.dl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-block:4px 20px;font-size:13.5px}
+button,.btn{font:500 13.5px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:7px 12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button:hover,.btn:hover{border-color:var(--accent)}
+/* filtres */
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-block:1px solid var(--line);padding-block:10px}
+.frow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.frow input[type=search]{flex:1 1 220px;min-width:0;font:14px var(--f-body);padding:7px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink)}
+.frow select{font:13.5px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);max-width:100%}
+.count{font:500 13px var(--f-mono);color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums}
+section.block{padding-block:34px 8px;display:grid;gap:12px}
+section.block > *,.syn > *{min-width:0}
+.sub{max-width:75ch;color:var(--muted);font-size:14px;margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted);align-items:center}
+.legend svg{vertical-align:middle;margin-right:4px}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow-x:auto;position:relative}
+.fig svg{display:block}
+.fig text{fill:var(--muted);font:11px var(--f-mono)}
+.fig .grid{stroke:var(--line);stroke-width:1}
+.node{cursor:pointer;transition:opacity .15s}
+.node.dim{opacity:.12}
+.edge{stroke:var(--edge);stroke-width:.8;fill:none;opacity:.45;transition:opacity .15s}
+.edge.dim{opacity:.05}
+.edge.out{stroke:var(--ink);opacity:.95;stroke-width:1.4}
+.edge.in{stroke:var(--accent);opacity:.95;stroke-width:1.4;stroke-dasharray:4 3}
+.fig .bandlab{font:600 12px var(--f-body);fill:var(--muted)}
+#tip{position:fixed;pointer-events:none;z-index:30;background:var(--ink);color:var(--bg);font-size:12.5px;line-height:1.4;padding:7px 9px;border-radius:5px;max-width:300px;opacity:0;transition:opacity .1s}
+#tip b{font-weight:600}
+/* liste */
+.listhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+ol.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+ol.list li{border-bottom:1px solid var(--line)}
+ol.list button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:52px 14px minmax(0,1fr);gap:4px 10px;width:100%;padding:10px 4px;cursor:pointer}
+ol.list button:hover{background:var(--surface)}
+ol.list button:focus-visible{outline:2px solid var(--accent)}
+.ly{font:500 13px var(--f-mono);color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
+.lt{min-width:0}
+.lt .ti{display:block;font-weight:500}
+.lt .me{display:block;font-size:12.5px;color:var(--muted)}
+.dot{width:11px;height:11px;border-radius:50%;margin-top:6px;border:2px solid transparent}
+.dot.f-Geomorphology{background:var(--geo)} .dot.f-Hydrochemistry{background:var(--hyd)} .dot.f-Soil{background:var(--sol)} .dot.f-Other{background:transparent;border-color:var(--aut)}
+.dot.ini{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--ink)}
+.tag{display:inline-block;max-width:100%;font:500 11px var(--f-mono);border:1px solid var(--line);border-radius:3px;padding:0 5px;margin:0 4px 2px 0;color:var(--muted);overflow-wrap:anywhere}
+.tag.ini{border-color:var(--ink);color:var(--ink)}
+.tag.nl-metadata{border-color:var(--accent);color:var(--accent)}
+/* synthesis */
+.syn{display:grid;gap:12px;max-width:74ch}
+.syn p,.syn li{font-family:var(--f-display);font-size:17px;line-height:1.6;margin:0}
+.syn ul{margin:0;padding-left:20px;display:grid;gap:10px}
+.syn h4{margin-top:10px}
+a.rk{text-decoration:none;border-bottom:1px solid currentColor;white-space:nowrap;font-family:var(--f-body);font-size:.88em;font-weight:500}
+.tablewrap{overflow-x:auto;max-width:100%}
+table.reg{border-collapse:collapse;font-size:13px;font-family:var(--f-body);min-width:640px}
+table.reg th,table.reg td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.reg thead th{font:500 11px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+table.reg .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* reference card */
+#card{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--surface);border-left:1px solid var(--line);z-index:40;overflow-y:auto;box-shadow:-12px 0 32px rgba(0,0,0,.18);
+  padding:calc(env(safe-area-inset-top,0px) + 18px) max(20px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 30px) 22px}
+#card .close{position:sticky;top:0;float:right;margin:-4px -6px 0 8px}
+#card h2{font-size:22px;margin:6px 0 10px}
+#card dl{display:grid;grid-template-columns:1fr;gap:2px;margin:14px 0}
+#card dt{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:12px}
+#card dd{margin:0;font-size:14.5px}
+#card .refline{font-size:13.5px;color:var(--muted)}
+#card .warn{font-size:13px;background:var(--accent-soft);border-radius:4px;padding:6px 9px;margin-top:10px}
+#card ul.rel{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:4px}
+#card ul.rel a{font-size:13.5px}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:35}
+footer{padding-block:40px;color:var(--muted);font-size:13px}
+@media (max-width:700px){ .filters{position:static} }
+@media (max-width:600px){ ol.list button{grid-template-columns:40px 12px minmax(0,1fr)} .syn p,.syn li{font-size:16px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+
+<div id="tip" role="tooltip"></div>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Zotero library “Stage AMAP 2026” · acid rock drainage</div>
+  <h1>ARD Literature Map</h1>
+  <p class="lede" id="scope"></p>
+  <div class="facts" id="facts"></div>
+</header>
+
+<div class="about">
+  <div class="bars">
+    <div><div class="eyebrow">Main theme</div><div class="bar" id="barFam"></div><div class="barlab" id="labFam"></div></div>
+    <div><div class="eyebrow">Reading level</div><div class="bar" id="barNl"></div><div class="barlab" id="labNl"></div></div>
+  </div>
+  <div>
+    <details><summary>How the corpus was built</summary><ul id="choices"></ul></details>
+    <details><summary>Choices made for these deliverables</summary><ul id="choices2"></ul></details>
+    <details><summary>Limitations</summary><ul id="limitations"></ul></details>
+    <details><summary>Sources searched</summary><ul id="sources"></ul></details>
+  </div>
+</div>
+
+<div class="dl" id="dl">
+  <span class="eyebrow">Files</span>
+  <button id="btnCsv" type="button">Download the table (CSV)</button>
+  <a class="btn" id="lnkBib" href="ARD_corpus.bib" target="_blank" rel="noopener">Open ARD_corpus.bib</a>
+  <button id="btnBib" type="button">Copy the BibLaTeX</button>
+  <a class="btn" id="lnkXlsx" href="ARD_reading_table.xlsx" target="_blank" rel="noopener">Excel table</a>
+  <span class="muted" id="dlmsg" aria-live="polite"></span>
+</div>
+</div>
+
+<div class="filters"><div class="wrap">
+  <div class="frow" role="search">
+    <input type="search" id="q" placeholder="Search: title, author, site, method…" aria-label="Text search">
+    <select id="fFam" aria-label="Theme"></select>
+    <select id="fReg" aria-label="Region"></select>
+    <select id="fPays" aria-label="Country"></select>
+    <select id="fOri" aria-label="Origin"></select>
+    <select id="fNl" aria-label="Reading level"></select>
+    <select id="fSt" aria-label="Status"></select>
+    <button type="button" id="reset">Reset</button>
+    <span class="count" id="count"></span>
+  </div>
+</div></div>
+
+<main class="wrap">
+<section class="block" id="frise">
+  <div class="eyebrow">Figure 1</div>
+  <h2>Timeline</h2>
+  <p class="sub">One dot per reference, stacked by publication year and coloured by main theme. References published before 1990 are grouped in the first column. Click a dot to open its card.</p>
+  <div class="legend" id="legend1"></div>
+  <div class="fig"><svg id="svgT" role="img" aria-label="Timeline of references"></svg></div>
+</section>
+
+<section class="block" id="graphe">
+  <div class="eyebrow">Figure 2</div>
+  <h2>Who cites whom in the corpus</h2>
+  <p class="sub">Each line joins two corpus references where one cites the other (citations found through OpenAlex and Crossref). Horizontal position: year; bands: main theme; size: number of citations received within the corpus. Hovering over a reference shows the works it builds on (solid lines) and the works that follow it up (dashed lines).</p>
+  <div class="legend" id="legend2"></div>
+  <div class="fig"><svg id="svgG" role="img" aria-label="Citation graph within the corpus"></svg></div>
+</section>
+
+<section class="block" id="articles">
+  <div class="listhead">
+    <div><div class="eyebrow">References</div><h2>Reference cards</h2></div>
+    <select id="sort" aria-label="Sort">
+      <option value="yd">Newest first</option>
+      <option value="ya">Oldest first</option>
+      <option value="cb">Most cited in the corpus</option>
+      <option value="au">First author (A→Z)</option>
+    </select>
+  </div>
+  <ol class="list" id="list"></ol>
+</section>
+
+<section class="block" id="synthese">
+  <div class="eyebrow">Synthesis</div>
+  <h2>What this literature says</h2>
+  <p class="sub">Written from the corpus fields (question, methods, results, contribution) and within the limits of their reading level. Clickable names open the matching card.</p>
+  <!--__SYNTHESIS__-->
+</section>
+</main>
+
+<footer class="wrap" id="foot"></footer>
+
+<div id="scrim" hidden></div>
+<aside id="card" hidden role="dialog" aria-modal="true" aria-labelledby="fTitle"></aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+const META = /*__META__*/null;
+const BY = Object.fromEntries(DATA.map(d=>[d.k,d]));
+const FAMS = ['Geomorphology','Hydrochemistry','Soil','Other'];
+const FAMLAB = {Geomorphology:'Geomorphology & ARD',Hydrochemistry:'Hydrochemistry & ARD',Soil:'Soil & ARD',Other:'Other'};
+const FAMVAR = {Geomorphology:'--geo',Hydrochemistry:'--hyd',Soil:'--sol',Other:'--aut'};
+const NLS = ['full text','abstract','metadata'];
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const css = v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+/* ---------- header ---------- */
+$('#scope').textContent = META.scope;
+const nNew = DATA.filter(d=>d.st==='new').length, nIni = DATA.length-nNew;
+const nFull = DATA.filter(d=>d.nl==='full text').length;
+const nEdges = DATA.reduce((s,d)=>s+d.c.length,0);
+$('#facts').innerHTML = `<span><b>${DATA.length}</b>references</span><span><b>${nIni}</b>from the initial bibliography</span><span><b>${nNew}</b>new</span><span><b>${nEdges}</b>internal citation links</span><span class="muted" style="align-self:end">Corpus of ${new Date(META.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · ${META.nq} queries</span>`;
+for (const [id,arr] of [['#choices',META.choices],['#choices2',META.notes2],['#limitations',META.limitations],['#sources',META.sources]])
+  $(id).innerHTML = arr.map(s=>`<li>${esc(s)}</li>`).join('');
+function stackBar(bar,lab,groups){
+  const tot = groups.reduce((s,g)=>s+g.n,0);
+  $(bar).innerHTML = groups.map(g=>`<span title="${esc(g.l)} : ${g.n}" style="width:${100*g.n/tot}%;background:${g.c}"></span>`).join('');
+  $(lab).innerHTML = groups.map(g=>`<span><i style="background:${g.c};${g.ring?`border:2px solid ${g.ring};background:transparent`:''}"></i>${esc(g.l)} <span class="mono">${g.n}</span> (${Math.round(100*g.n/tot)} %)</span>`).join('');
+}
+function drawBars(){
+  stackBar('#barFam','#labFam',FAMS.map(f=>({l:FAMLAB[f],n:DATA.filter(d=>d.f===f).length,c:f==='Other'?css('--edge'):css(FAMVAR[f])})));
+  stackBar('#barNl','#labNl',NLS.map((l,i)=>({l,n:DATA.filter(d=>d.nl===l).length,c:[css('--ink'),css('--muted'),css('--edge')][i]})));
+}
+
+/* ---------- filtres ---------- */
+const uniq = a=>[...new Set(a)];
+function fillSel(id,label,vals){ $(id).innerHTML = `<option value="">${label}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(''); }
+fillSel('#fFam','All themes',FAMS.map(f=>FAMLAB[f]));
+fillSel('#fReg','All regions',META.regions.filter(r=>DATA.some(d=>d.rg===r)));
+fillSel('#fPays','All countries',uniq(DATA.flatMap(d=>d.py)).sort((a,b)=>a.localeCompare(b,'en')));
+fillSel('#fOri','All origins',uniq(DATA.map(d=>d.or)).sort((a,b)=>a.localeCompare(b,'en')));
+fillSel('#fNl','All reading levels',NLS);
+fillSel('#fSt','All statuses',['initial bibliography','new']);
+const norm = s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+DATA.forEach(d=>d._s = norm([d.k,d.t,d.au.join(' '),d.v,d.si,d.rg,d.pys,d.m,d.r,d.a,d.q,d.th,d.ts.join(' '),d.doi].join(' ')));
+let match = new Set(DATA.map(d=>d.k));
+function applyFilters(){
+  const q = norm($('#q').value).split(/\s+/).filter(Boolean);
+  const fam = $('#fFam').value, rg=$('#fReg').value, py=$('#fPays').value, or=$('#fOri').value, nl=$('#fNl').value, st=$('#fSt').value;
+  match = new Set(DATA.filter(d=>
+    (!fam || FAMLAB[d.f]===fam) && (!rg || d.rg===rg) && (!py || d.py.includes(py)) && (!or || d.or===or) &&
+    (!nl || d.nl===nl) && (!st || d.st===st) && q.every(w=>d._s.includes(w))).map(d=>d.k));
+  $('#count').textContent = `${match.size} / ${DATA.length}`;
+  d3.selectAll('.node').classed('dim',d=>!match.has(d.k));
+  d3.selectAll('.edge').classed('dim',e=>!(match.has(e.source.k)&&match.has(e.target.k)));
+  renderList();
+}
+['#q','#fFam','#fReg','#fPays','#fOri','#fNl','#fSt'].forEach(id=>$(id).addEventListener('input',applyFilters));
+$('#reset').addEventListener('click',()=>{ ['#q','#fFam','#fReg','#fPays','#fOri','#fNl','#fSt'].forEach(id=>$(id).value=''); applyFilters(); });
+
+/* ---------- marques communes ---------- */
+function styleNode(sel){
+  sel.attr('fill',d=>d.f==='Other'?'var(--surface)':`var(${FAMVAR[d.f]})`)
+     .attr('stroke',d=>d.st==='initial bibliography'?'var(--ink)':(d.f==='Other'?'var(--aut)':'var(--surface)'))
+     .attr('stroke-width',d=>d.st==='initial bibliography'?2.6:(d.f==='Other'?1.8:1.2));
+}
+function legendHTML(withSize){
+  const sw=(f,ini)=>`<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="${f==='Other'?'var(--surface)':`var(${FAMVAR[f]})`}" stroke="${ini?'var(--ink)':(f==='Other'?'var(--aut)':'none')}" stroke-width="${ini?2.6:1.8}"/></svg>`;
+  let h = FAMS.map(f=>`<span>${sw(f)}${FAMLAB[f]}${f==='Other'?' (hollow circle)':''}</span>`).join('');
+  h += `<span>${sw('Hydrochemistry',true)}Initial bibliography (dark ring)</span>`;
+  if(withSize) h += `<span><svg width="44" height="16" aria-hidden="true"><line x1="2" y1="8" x2="20" y2="8" stroke="var(--ink)" stroke-width="1.4"/><line x1="24" y1="8" x2="42" y2="8" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="4 3"/></svg>builds on · followed up by</span><span>size = citations received</span>`;
+  return h;
+}
+$('#legend1').innerHTML = legendHTML(false);
+$('#legend2').innerHTML = legendHTML(true);
+const tip = $('#tip');
+function showTip(ev,d){
+  tip.innerHTML = `<b>${esc(d.l)}</b> · ${esc(d.rg)}<br>${esc(d.t.length>120?d.t.slice(0,118)+'…':d.t)}<br><span style="opacity:.75">${esc(d.th)} · cited ${d.cb.length}× · cites ${d.c.length}</span>`;
+  const x = Math.min(ev.clientX+14, innerWidth-310), y = Math.min(ev.clientY+14, innerHeight-110);
+  tip.style.left = Math.max(8,x)+'px'; tip.style.top = y+'px'; tip.style.opacity = 1;
+}
+const hideTip = ()=>tip.style.opacity=0;
+
+/* ---------- frise ---------- */
+function drawTimeline(){
+  const cols = ['<1990']; for(let y=1990;y<=2026;y++) cols.push(String(y));
+  const colOf = d=>d.y<1990?'<1990':String(d.y);
+  const groups = d3.group(DATA, colOf);
+  const famIdx = Object.fromEntries(FAMS.map((f,i)=>[f,i]));
+  const maxN = d3.max(cols,c=>(groups.get(c)||[]).length);
+  const step = 11, padL=34, padR=12, padT=14, padB=34;
+  const W = Math.max(860, $('#frise .fig').clientWidth);
+  const H = padT + maxN*step + padB;
+  const x = d3.scaleBand().domain(cols).range([padL,W-padR]).padding(.1);
+  const svg = d3.select('#svgT').attr('width',W).attr('height',H).attr('viewBox',`0 0 ${W} ${H}`);
+  svg.selectAll('*').remove();
+  const base = H-padB;
+  [5,10,15,20,25,30].filter(n=>n<=maxN).forEach(n=>{
+    svg.append('line').attr('class','grid').attr('x1',padL).attr('x2',W-padR).attr('y1',base-n*step+step/2).attr('y2',base-n*step+step/2);
+    svg.append('text').attr('x',padL-6).attr('y',base-n*step+step/2+4).attr('text-anchor','end').text(n);
+  });
+  cols.forEach((c,i)=>{ if(c==='<1990'||((+c)%5===0&&+c>1990)) svg.append('text').attr('x',x(c)+x.bandwidth()/2).attr('y',base+18).attr('text-anchor','middle').text(c==='<1990'?'av. 1990':c); });
+  svg.append('line').attr('x1',padL).attr('x2',W-padR).attr('y1',base+3).attr('y2',base+3).attr('stroke','var(--muted)');
+  const pts=[];
+  for(const [c,arr] of groups){ arr.slice().sort((a,b)=>famIdx[a.f]-famIdx[b.f]||(a.st<b.st?-1:1)).forEach((d,i)=>pts.push({d,cx:x(c)+x.bandwidth()/2,cy:base-i*step-step/2+2})); }
+  const r = Math.min(4.6,x.bandwidth()/2-1);
+  const g = svg.append('g').selectAll('circle').data(pts).join('circle').attr('class','node')
+    .attr('cx',p=>p.cx).attr('cy',p=>p.cy).attr('r',r);
+  g.each(function(p){ this.__data__ = Object.assign(p,{k:p.d.k}); });
+  g.attr('fill',p=>p.d.f==='Other'?'var(--surface)':`var(${FAMVAR[p.d.f]})`)
+   .attr('stroke',p=>p.d.st==='initial bibliography'?'var(--ink)':(p.d.f==='Other'?'var(--aut)':'none'))
+   .attr('stroke-width',p=>p.d.st==='initial bibliography'?2.2:1.6)
+   .on('mousemove',(ev,p)=>showTip(ev,p.d)).on('mouseleave',hideTip).on('click',(ev,p)=>openCard(p.d.k));
+  // zone de clic plus large que la marque
+  svg.append('g').selectAll('rect').data(pts).join('rect').attr('x',p=>p.cx-x.bandwidth()/2).attr('y',p=>p.cy-step/2).attr('width',x.bandwidth()).attr('height',step)
+    .attr('fill','transparent').style('cursor','pointer')
+    .on('mousemove',(ev,p)=>showTip(ev,p.d)).on('mouseleave',hideTip).on('click',(ev,p)=>openCard(p.d.k));
+}
+
+/* ---------- graphe ---------- */
+let simDone=false, gNodes, gLinks;
+function drawGraph(){
+  const W=1100, H=780, padL=40, padR=24;
+  const x = d3.scaleLinear().domain([1968,1995,2010,2020,2027]).range([padL, padL+(W-padL-padR)*.12, padL+(W-padL-padR)*.36, padL+(W-padL-padR)*.68, W-padR]);
+  const bands = {Geomorphology:[28,110],Hydrochemistry:[120,440],Soil:[450,520],Other:[530,H-26]};
+  if(!simDone){
+    gNodes = DATA.map(d=>({...d, d, r:3.2+Math.sqrt(d.cb.length)*1.9, x:x(d.y), y:(bands[d.f][0]+bands[d.f][1])/2}));
+    const idx = Object.fromEntries(gNodes.map(n=>[n.k,n]));
+    gLinks = DATA.flatMap(d=>d.c.map(k=>({source:idx[d.k],target:idx[k]})));
+    const sim = d3.forceSimulation(gNodes)
+      .force('x',d3.forceX(n=>x(n.d.y)).strength(.9))
+      .force('y',d3.forceY(n=>(bands[n.f][0]+bands[n.f][1])/2).strength(n=>n.f==='Hydrochemistry'?.1:.09))
+      .force('link',d3.forceLink(gLinks).strength(.008))
+      .force('collide',d3.forceCollide(n=>n.r+1.6).iterations(3)).stop();
+    for(let i=0;i<500;i++){ sim.tick(); gNodes.forEach(n=>{ const [a,b]=bands[n.f]; n.y=Math.max(a+n.r,Math.min(b-n.r,n.y)); }); }
+    simDone=true;
+  }
+  const svg = d3.select('#svgG').attr('viewBox',`0 0 ${W} ${H}`).attr('width',W).attr('height',H).style('max-width','100%').style('height','auto').style('min-width','760px');
+  svg.selectAll('*').remove();
+  Object.entries(bands).forEach(([f,[a,b]],i)=>{
+    if(i) svg.append('line').attr('class','grid').attr('x1',0).attr('x2',W).attr('y1',a-5).attr('y2',a-5);
+    svg.append('text').attr('class','bandlab').attr('x',8).attr('y',a+10).text(FAMLAB[f]);
+  });
+  [1970,1990,2000,2005,2010,2015,2020,2025].forEach(y=>{
+    svg.append('line').attr('class','grid').attr('x1',x(y)).attr('x2',x(y)).attr('y1',18).attr('y2',H-22).attr('stroke-dasharray','2 4');
+    svg.append('text').attr('x',x(y)).attr('y',H-6).attr('text-anchor','middle').text(y);
+  });
+  const ed = svg.append('g').selectAll('line').data(gLinks).join('line').attr('class','edge')
+    .attr('x1',l=>l.source.x).attr('y1',l=>l.source.y).attr('x2',l=>l.target.x).attr('y2',l=>l.target.y);
+  const nd = svg.append('g').selectAll('circle').data(gNodes).join('circle').attr('class','node')
+    .attr('cx',n=>n.x).attr('cy',n=>n.y).attr('r',n=>n.r);
+  styleNode(nd);
+  nd.on('mouseenter',(ev,n)=>{
+      ed.classed('out',l=>l.source===n).classed('in',l=>l.target===n);
+      const nb = new Set([n.k,...n.c,...n.cb]);
+      nd.classed('dim',m=>!nb.has(m.k));
+      ed.classed('dim',l=>!(l.source===n||l.target===n));
+    })
+    .on('mousemove',(ev,n)=>showTip(ev,n.d))
+    .on('mouseleave',()=>{ hideTip(); ed.classed('out',false).classed('in',false); applyFilters(); })
+    .on('click',(ev,n)=>openCard(n.k));
+  // labels for the most cited references
+  const placed=[], top=[];
+  gNodes.filter(n=>n.cb.length>=14).sort((a,b)=>b.cb.length-a.cb.length).forEach(n=>{
+    const w=n.l.length*6.1, h=12;
+    for(const ly of [n.y-n.r-3, n.y+n.r+11]){
+      const bx={x0:n.x-w/2,x1:n.x+w/2,y0:ly-h+2,y1:ly+2};
+      if(bx.x0<2||bx.x1>W-2) continue;
+      if(placed.some(p=>!(bx.x1<p.x0||bx.x0>p.x1||bx.y1<p.y0||bx.y0>p.y1))) continue;
+      placed.push(bx); top.push({n,ly}); break;
+    }
+  });
+  svg.append('g').selectAll('text').data(top).join('text').attr('x',t=>t.n.x).attr('y',t=>t.ly).attr('text-anchor','middle')
+    .style('font-family','var(--f-body)').style('font-size','11px').style('fill','var(--ink)').style('pointer-events','none')
+    .style('paint-order','stroke').style('stroke','var(--surface)').style('stroke-width','3px').text(t=>t.n.l);
+}
+
+/* ---------- liste ---------- */
+function renderList(){
+  const s = $('#sort').value;
+  const cmp = {yd:(a,b)=>b.y-a.y||a.k.localeCompare(b.k), ya:(a,b)=>a.y-b.y||a.k.localeCompare(b.k),
+               cb:(a,b)=>b.cb.length-a.cb.length||a.y-b.y, au:(a,b)=>a.l.localeCompare(b.l,'fr')}[s];
+  $('#list').innerHTML = DATA.filter(d=>match.has(d.k)).sort(cmp).map(d=>`<li><button type="button" data-k="${d.k}">
+    <span class="ly">${d.y}</span><span class="dot f-${d.f}${d.st==='initial bibliography'?' ini':''}" aria-hidden="true"></span>
+    <span class="lt"><span class="ti">${esc(d.t)}</span><span class="me">${esc(d.l)} · ${esc(d.v||d.dt)} · ${esc(d.rg)}${d.si?' — '+esc(d.si):''}</span>
+    <span class="me">${d.st==='initial bibliography'?'<span class="tag ini">initial bibliography</span>':''}<span class="tag">${esc(d.th)}</span><span class="tag nl-${d.nl}">${esc(d.nl)}</span>${d.cb.length?`<span class="tag">cited ${d.cb.length}×</span>`:''}</span></span>
+  </button></li>`).join('') || '<li class="muted" style="padding:14px 4px">No reference matches these filters. Reset them to show everything.</li>';
+}
+$('#sort').addEventListener('input',renderList);
+$('#list').addEventListener('click',ev=>{ const b=ev.target.closest('button[data-k]'); if(b) openCard(b.dataset.k); });
+
+/* ---------- reference card ---------- */
+let lastFocus=null;
+const relList = ks=>ks.length?`<ul class="rel">${ks.map(k=>`<li><a href="#${k}" data-k="${k}">${esc(BY[k].l)}</a> <span class="muted">— ${esc(BY[k].t.length>90?BY[k].t.slice(0,88)+'…':BY[k].t)}</span></li>`).join('')}</ul>`:'<span class="muted">None in the corpus.</span>';
+function openCard(k){
+  const d = BY[k]; if(!d) return;
+  hideTip(); if($('#card').hidden) lastFocus=document.activeElement;
+  const nlw = d.nl==='full text'?'' : `<div class="warn">Reading level: <b>${esc(d.nl)}</b>. ${d.nl==='metadata'?'Neither the text nor the abstract was read: this card relies on the title and metadata.':'Only the abstract was read: methods and results say no more than it does.'}</div>`;
+  const fld = (t,v)=>v?`<dt>${t}</dt><dd>${esc(v)}</dd>`:'';
+  $('#card').innerHTML = `<button class="close" type="button" aria-label="Close the card">Close ✕</button>
+    <div class="eyebrow">${esc(d.y)} · ${esc(d.dt)}${d.pr?'':' · not peer reviewed'} · <span class="mono">${esc(d.k)}</span></div>
+    <h2 id="fTitle">${esc(d.t)}</h2>
+    <p class="refline">${esc(d.ref)}</p>
+    <p style="display:flex;flex-wrap:wrap;gap:8px">${d.u?`<a class="btn" href="${esc(d.u)}" target="_blank" rel="noopener">${d.doi?'DOI '+esc(d.doi):'Link'}</a>`:''}${d.oa?`<a class="btn" href="${esc(d.oa)}" target="_blank" rel="noopener">Open access</a>`:''}</p>
+    <p>${d.st==='initial bibliography'?'<span class="tag ini">initial bibliography</span>':'<span class="tag">new</span>'}${d.ctx?'<span class="tag">context</span>':''}<span class="tag">${esc(d.th)}</span>${d.ts.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</p>
+    ${nlw}
+    <dl>
+      ${fld('Question',d.q)}
+      ${fld('Location',[d.rg,d.pys].filter(Boolean).join(' · '))}${fld('Site',d.si)}
+      ${fld('Origin · trigger',`${d.or} · ${d.de}`)}
+      ${fld('Methods',d.m)}${fld('Key results',d.r)}${fld('Contribution',d.a)}
+      <dt>Builds on (${d.c.length})</dt><dd>${relList(d.c)}</dd>
+      <dt>Followed up by (${d.cb.length})</dt><dd>${relList(d.cb)}</dd>
+      ${fld('Note',d.rq)}${fld('Theme (original label)',d.tho!==d.th?d.tho:'')}${fld('Found via',d.fv)}
+    </dl>`;
+  $('#card').hidden=false; $('#scrim').hidden=false; $('#card').scrollTop=0;
+  $('#card .close').focus();
+}
+function closeCard(){ $('#card').hidden=true; $('#scrim').hidden=true; if(lastFocus) lastFocus.focus(); }
+$('#scrim').addEventListener('click',closeCard);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !$('#card').hidden) closeCard(); });
+document.addEventListener('click',ev=>{
+  if(ev.target.closest('#card .close')) return closeCard();
+  const a = ev.target.closest('a[data-k]'); if(a){ ev.preventDefault(); openCard(a.dataset.k); }
+});
+
+/* ---------- files ---------- */
+let bibText=null, downloads=null;
+fetch('ARD_corpus.bib').then(r=>r.ok?r.text():null).then(t=>bibText=t).catch(()=>{});
+try{ $('#lnkBib').href = new URL('ARD_corpus.bib', location.href).href; }catch(e){}
+const msg = t=>$('#dlmsg').textContent=t;
+if(window.claude && window.claude.use){ window.claude.use('downloads').then(x=>{ downloads=x; }).catch(()=>{}); }
+$('#btnCsv').addEventListener('click',async()=>{
+  if(!downloads){ $('#dlmsg').innerHTML = `<a href="${esc(new URL('ARD_reading_table.csv',location.href).href)}" target="_blank" rel="noopener">Open ARD_reading_table.csv</a>`; return; }
+  try{
+    const r = await fetch('ARD_reading_table.csv'); if(!r.ok) throw {code:'unavailable'};
+    await downloads.save({filename:'ARD_reading_table.csv', data: await r.blob()}); msg('Table saved.');
+  }catch(e){ msg(e && e.code==='declined' ? 'Download cancelled.' : 'Download unavailable here. Use the Excel table link instead.'); }
+});
+$('#btnBib').addEventListener('click',()=>{
+  if(!bibText){ msg('The BibLaTeX file is not loaded yet. Use the “Open ARD_corpus.bib” link.'); return; }
+  const fallback=()=>{ const ta=document.createElement('textarea'); ta.value=bibText; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); let ok=false; try{ok=document.execCommand('copy');}catch(e){} ta.remove(); msg(ok?'BibLaTeX copied: paste it into Zotero (File › Import from Clipboard).':'Copying is blocked here: open the file with the link.'); };
+  try{ navigator.clipboard.writeText(bibText).then(()=>msg('BibLaTeX copied: paste it into Zotero (File › Import from Clipboard).'),fallback); }catch(e){ fallback(); }
+});
+$('#foot').innerHTML = `Corpus dated ${esc(META.date)}. Map, reading table and BibLaTeX file are generated by the same script from data/corpus.json and contain the same ${DATA.length} references.`;
+
+/* ---------- start ---------- */
+function drawAll(){ drawBars(); drawTimeline(); drawGraph(); applyFilters(); }
+drawAll();
+let rT; addEventListener('resize',()=>{ clearTimeout(rT); rT=setTimeout(()=>{ drawTimeline(); applyFilters(); },150); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',drawBars);
+new MutationObserver(drawBars).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+const h = decodeURIComponent(location.hash.slice(1)); if(BY[h]) openCard(h);
+</script>

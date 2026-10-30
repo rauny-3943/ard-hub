@@ -1,0 +1,10 @@
+# Required (build, literature watch, tests)
+openpyxl>=3.1
+PyYAML>=6.0
+pytest>=8.0
+# Reading local PDFs (compare_local.py, pdf_notes.py)
+pypdf>=4.0
+# Optional, local use only: better PDF identification
+# pdf2doi>=1.7
+# Optional, local use only: sourced question answering over your pdfs/ folder
+# paper-qa>=5

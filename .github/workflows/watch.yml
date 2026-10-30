@@ -1,0 +1,59 @@
+# Weekly literature watch: finds new publications and proposes the candidates in a pull request.
+# To screen: in the pull request, edit data/candidates/to_screen.csv (decision column = keep / reject).
+# The "Integrate screening" workflow then adds the kept references to the corpus, on the same branch.
+name: Literature watch
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"   # Monday 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Start date YYYY-MM-DD (empty = since the last run)"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - id: search
+        name: Query OpenAlex and Semantic Scholar
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+          SINCE: ${{ inputs.since }}
+        run: |
+          if [ -n "$SINCE" ]; then
+            python scripts/search.py --since "$SINCE"
+          else
+            python scripts/search.py
+          fi
+      - name: Propose the candidates
+        if: steps.search.outputs.new != '0'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: watch/${{ steps.search.outputs.date }}
+          commit-message: "Literature watch ${{ steps.search.outputs.date }}: ${{ steps.search.outputs.new }} candidates"
+          title: "Literature watch ${{ steps.search.outputs.date }}: ${{ steps.search.outputs.new }} candidates to screen"
+          body-path: ${{ steps.search.outputs.report }}
+          labels: watch
+          add-paths: data/candidates/**
+      - name: Record the run date when nothing is new
+        if: steps.search.outputs.new == '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/candidates/state.json
+          git commit -m "Literature watch ${{ steps.search.outputs.date }}: no new candidate" || true
+          git push

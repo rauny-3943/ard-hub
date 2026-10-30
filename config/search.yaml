@@ -1,0 +1,62 @@
+# Settings for the literature watch (scripts/search.py)
+# Edit this file to change the scope; the weekly watch reads it again at every run.
+
+# Contact address sent to OpenAlex ("polite pool").
+# Leave it empty in a public repository if you prefer, and use the CONTACT_EMAIL secret instead.
+contact_email: ""
+
+# Start date if no watch has run yet (YYYY-MM-DD).
+# Afterwards, each run starts from the date of the previous successful run (data/candidates/state.json).
+default_since: "2026-10-01"
+
+# Maximum number of results kept per query or per followed paper.
+max_per_query: 40
+
+# OpenAlex work types kept (article, review, book-chapter, preprint, dissertation, report…).
+types: [article, review, book-chapter, preprint, dissertation, report]
+
+# 1) Full-text queries (title + abstract) on OpenAlex.
+queries:
+  - "acid rock drainage glacier"
+  - "acid rock drainage permafrost"
+  - "acid rock drainage rock glacier"
+  - "natural acid rock drainage"
+  - "acid drainage proglacial"
+  - "sulfide oxidation glacier retreat water quality"
+  - "rock glacier spring nickel sulfate"
+  - "permafrost thaw stream acidification metals"
+  - "Cordillera Blanca water quality metals"
+  - "Cordillera Blanca acid"
+  - "Pyrenees acid rock drainage"
+  - "Pyrenees ferricrete"
+  - "drenaje ácido de roca glaciar"
+  - "drenaje ácido Cordillera Blanca"
+  - "drainage rocheux acide"
+  - "proglacial soil acidification pyrite"
+  - "acid rock drainage vegetation"
+  - "acid rock drainage plant traits"
+
+# 2) Followed papers: the watch looks for new works that cite them (corpus keys).
+follow_citations_of:
+  - Zarroca2021
+  - Santofimia2017
+  - Fortner2011
+  - Magnusson2020
+  - Garcia2025
+  - BravoZevallos2024
+  - Zimmer2023c
+  - GuijosaOrtega2025
+  - Guerra2026
+  - Williams2005
+  - Thies2007
+  - Colombo2017
+  - Wanner2023
+  - Brighenti2024
+  - ODonnell2024
+  - Manning2024
+
+# 3) Semantic Scholar recommendations based on the followed papers (optional; a free key helps).
+semantic_scholar_recommendations: true
+
+# Minimum score for a candidate to appear in the report (see README, "Literature watch").
+min_score: 1

@@ -1,0 +1,55 @@
+# Drafts an update of the synthesis with GitHub Models (free within the free tier limits; no key to create:
+# the workflow token is enough thanks to the models: read permission).
+# The result arrives in a pull request: nothing is published without your review.
+name: Draft synthesis
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "new = paragraphs for references not cited yet; full = complete draft"
+        type: choice
+        options: [new, full]
+        default: new
+      model:
+        description: "GitHub Models model (see github.com/marketplace/models)"
+        default: "openai/gpt-4.1-mini"
+
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
+jobs:
+  synthesis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Write the draft
+        env:
+          LLM_PROVIDER: github
+          LLM_MODEL: ${{ inputs.model }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          if [ "$MODE" = "full" ]; then
+            python scripts/synthesis_llm.py --full
+          else
+            python scripts/synthesis_llm.py
+          fi
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: synthesis/${{ github.run_id }}
+          commit-message: "Synthesis draft (${{ inputs.mode }}, ${{ inputs.model }})"
+          title: "Synthesis draft (${{ inputs.mode }})"
+          body: |
+            Draft written by ${{ inputs.model }} from the corpus fields (not from the PDFs).
+            To review: copy what you keep into `data/synthesis.html`, then close or merge.
+          add-paths: |
+            data/synthesis_proposals.md
+            data/synthesis_draft.html

@@ -1,0 +1,32 @@
+# Optional: write "@claude …" in an issue or pull request (e.g. "@claude add these DOIs to the corpus,
+# fill in their cards from the abstracts and update the synthesis"); Claude answers and opens a pull request.
+# Requires the ANTHROPIC_API_KEY secret (pay-as-you-go).
+# Security: the repository is public, so only you (OWNER), members and collaborators can trigger Claude.
+name: Claude
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  claude:
+    if: >-
+      (contains(github.event.comment.body, '@claude') || contains(github.event.issue.body, '@claude')) &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'),
+               github.event.comment.author_association || github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
