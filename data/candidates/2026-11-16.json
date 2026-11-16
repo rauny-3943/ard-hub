@@ -1,0 +1,29 @@
+{
+ "since": "2026-11-09",
+ "date": "2026-11-16",
+ "errors": [],
+ "candidates": [
+  {
+   "decision": "",
+   "score": 9,
+   "proposed_key": "Scott2026",
+   "year": 2026,
+   "title": "Laboratory-based assessment of quantitative PCR to describe Arctic fish assemblages in surface water affected by acid rock drainage",
+   "authors": "Scott, Laura C.; Ramey, Andrew M.; Riddle-Berntsen, Ann E.; Poulin, Brett A.; Koch, Joshua C.; O’Donnell, Jonathan A. …",
+   "venue": "PLoS ONE",
+   "doi": "10.1371/journal.pone.0362179",
+   "openalex": "https://openalex.org/W7225728199",
+   "found_via": "query \"acid rock drainage\" AND permafrost ; query \"permafrost thaw\" AND (acidification OR metals OR \"rusting\") ; cites ODonnell2024",
+   "cites_in_corpus": "Evinger2026; ODonnell2024; Skierszkan2026",
+   "open_access": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0362179&type=printable",
+   "main_theme": "",
+   "secondary_themes": "",
+   "region": "",
+   "country": "",
+   "site": "",
+   "origin": "",
+   "trigger": "",
+   "search_date": "2026-11-16"
+  }
+ ]
+}
